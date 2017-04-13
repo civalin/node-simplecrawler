@@ -17,6 +17,19 @@ var cookies = [
     "Set-Cookie: test=test; path=/test; domain=test.com"
 ];
 
+var subDomainOrderCookies = [
+    "Set-Cookie: domainorder=test1; path=/domainorder; domain=order.com",
+    "Set-Cookie: domainorder=test2; path=/domainorder; domain=.order.com",
+    "Set-Cookie: domainorder=test3; path=/domainorder; domain=order.com",
+    "Set-Cookie: domainorder=test4; path=/domainorder; domain=.order.com",
+    "Set-Cookie: domainorder=test5; path=/domainorder; domain=order.com",
+    "Set-Cookie: domainorder=test6; path=/domainorder; domain=.order.com",
+    "Set-Cookie: domainorder=test7; path=/domainorder; domain=order.com",
+    "Set-Cookie: domainorder=test8; path=/domainorder; domain=.order.com",
+    "Set-Cookie: domainorder=test9; path=/domainorder; domain=order.com",
+    "Set-Cookie: domainorder=test10; path=/domainorder; domain=.order.com"
+];
+
 describe("Cookies", function() {
 
     var CookieJar = require("../lib/cookies.js");
@@ -95,6 +108,23 @@ describe("Cookies", function() {
                               parsedCookie.path,
                               parsedCookie.domain,
                               parsedCookie.httponly);
+            });
+
+            cookieJar.cookies.length.should.equal(cookies.length);
+        });
+
+        it("should be able process subdomain wildcard repeatedly", function() {
+            var cookieJar = new CookieJar();
+
+            subDomainOrderCookies.forEach(function(cookie) {
+                var parsedCookie = Cookie.fromString(cookie);
+
+                cookieJar.add(parsedCookie.name,
+                              parsedCookie.value,
+                              parsedCookie.expires,
+                              parsedCookie.path,
+                              parsedCookie.domain,
+                              parsedCookie.httponly);
 
                 var cookiesAdded = cookieJar.get(parsedCookie.name),
                     parsedCookie2 = cookiesAdded.pop();
@@ -107,7 +137,7 @@ describe("Cookies", function() {
                 parsedCookie2.httponly.should.equal(parsedCookie.httponly);
             });
 
-            cookieJar.cookies.length.should.equal(cookies.length);
+            cookieJar.cookies.length.should.equal(2);
         });
 
         it("should be able to remove cookies by name", function() {
